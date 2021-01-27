@@ -82,6 +82,7 @@ RUN set -x \
 
 ENV SENTRY_VERSION 9.1.1
 
+COPY sentry-9.1.1-patched-py27-none-any.whl usr/src/sentry/sentry-${SENTRY_VERSION}-py27-none-any.whl
 RUN set -x \
     && buildDeps=" \
         g++ \
@@ -91,21 +92,8 @@ RUN set -x \
     " \
     && apt-get update && apt-get install -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /usr/src/sentry \
-    && wget -O /usr/src/sentry/sentry-${SENTRY_VERSION}-py27-none-any.whl "https://github.com/getsentry/sentry/releases/download/${SENTRY_VERSION}/sentry-${SENTRY_VERSION}-py27-none-any.whl" \
-    && wget -O /usr/src/sentry/sentry-${SENTRY_VERSION}-py27-none-any.whl.asc "https://github.com/getsentry/sentry/releases/download/${SENTRY_VERSION}/sentry-${SENTRY_VERSION}-py27-none-any.whl.asc" \
     && wget -O /usr/src/sentry/sentry_plugins-${SENTRY_VERSION}-py2.py3-none-any.whl "https://github.com/getsentry/sentry/releases/download/${SENTRY_VERSION}/sentry_plugins-${SENTRY_VERSION}-py2.py3-none-any.whl" \
-    && wget -O /usr/src/sentry/sentry_plugins-${SENTRY_VERSION}-py2.py3-none-any.whl.asc "https://github.com/getsentry/sentry/releases/download/${SENTRY_VERSION}/sentry_plugins-${SENTRY_VERSION}-py2.py3-none-any.whl.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
-    && for key in \
-      D8749766A66DD714236A932C3B2D400CE5BBCA60 \
-    ; do \
-      gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
-    done \
-    && gpg --batch --verify /usr/src/sentry/sentry-${SENTRY_VERSION}-py27-none-any.whl.asc /usr/src/sentry/sentry-${SENTRY_VERSION}-py27-none-any.whl \
-    && gpg --batch --verify /usr/src/sentry/sentry_plugins-${SENTRY_VERSION}-py2.py3-none-any.whl.asc /usr/src/sentry/sentry_plugins-${SENTRY_VERSION}-py2.py3-none-any.whl \
-    && gpgconf --kill all \
     && pip install \
         /usr/src/sentry/sentry-${SENTRY_VERSION}-py27-none-any.whl \
         /usr/src/sentry/sentry_plugins-${SENTRY_VERSION}-py2.py3-none-any.whl \
